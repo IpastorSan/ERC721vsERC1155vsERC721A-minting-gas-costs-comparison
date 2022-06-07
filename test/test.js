@@ -2,17 +2,19 @@ const { ethers} = require("hardhat");
 const { expect } = require("chai");
 
 
-describe("ERC721, ERC721A, ERC1155 minting for gas comparison", () => {
+describe("ERC721, ERC721A, ERC1155, ERC1155D minting for gas comparison", () => {
   let erc721Factory;
-  let erc721AFactory;
+  let erc721aFactory;
   let erc1155Factory;
+  let erc1155FactoryD;
   let erc721;
   let erc721a;
   let erc1155;
+  let erc1155d;
   let owner;
   let alice;
   let bob;
-  let amount = 1000;
+  let amount = 2;
 
   beforeEach(async () => {
     let signers = await ethers.getSigners()
@@ -31,12 +33,14 @@ describe("ERC721, ERC721A, ERC1155 minting for gas comparison", () => {
     erc721Factory = await ethers.getContractFactory("BasicERC721")
     erc721aFactory = await ethers.getContractFactory("BasicERC721A")
     erc1155Factory = await ethers.getContractFactory("BasicERC1155")
+    erc1155dFactory = await ethers.getContractFactory("BasicERC1155D")
 
     const baseTokenUri = "https://ipfs.io/ipfs/whatever/"
     
     erc721 = await erc721Factory.deploy(baseTokenUri)
     erc721a = await erc721aFactory.deploy(baseTokenUri)
     erc1155 = await erc1155Factory.deploy()
+    erc1155d = await erc1155dFactory.deploy()
 
 
 
@@ -62,6 +66,11 @@ describe("ERC721, ERC721A, ERC1155 minting for gas comparison", () => {
     it(`Should allow user to batch mint erc1155 ${amount} token with exact price`, async () => {
       await erc1155.connect(aliceAccount).mintBatchNFT(amount, {value: ethers.utils.parseEther(`${0.1*amount}`)})
       expect(await erc1155.balanceOf(alice, await erc1155.getCurrentId()-1)).to.be.equal(amount)
+    })
+
+    it(`Should allow user to batch mint erc1155D ${amount} token with exact price`, async () => {
+      await erc1155d.connect(aliceAccount).mintNFTs(amount, {value: ethers.utils.parseEther(`${0.1*amount}`)})
+      expect(await erc1155d.balanceOf(alice, await erc1155d.getCurrentId()-1)).to.be.equal(1)
     })
 
   })
