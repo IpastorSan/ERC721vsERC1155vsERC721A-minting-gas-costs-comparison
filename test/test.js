@@ -14,7 +14,7 @@ describe("ERC721, ERC721A, ERC1155, ERC1155D minting for gas comparison", () => 
   let owner;
   let alice;
   let bob;
-  let amount = 2;
+  let amount = 100;
 
   beforeEach(async () => {
     let signers = await ethers.getSigners()
@@ -106,6 +106,19 @@ describe("ERC721, ERC721A, ERC1155, ERC1155D minting for gas comparison", () => 
       expect(await erc1155.balanceOf(alice, amount-1)).to.be.equal(0)
       expect(await erc1155.balanceOf(carol, amount-1)).to.be.equal(1)
     })
+
+    it(`Should mint by Alice and try to transfer ${amount} erc1155D token from user Alice to user Carol`, async () => {
+      await erc1155d.connect(aliceAccount).mintNFTs(amount, {value: ethers.utils.parseEther(`${0.1*amount}`)})
+
+      for (let i = 0; i < amount ; i++){
+        await erc1155d.connect(aliceAccount).safeTransferFrom(alice, carol, i, 1, "0x")
+      }
+
+      expect(await erc1155d.balanceOf(alice, amount-1)).to.be.equal(0)
+      expect(await erc1155d.balanceOf(carol, amount-1)).to.be.equal(1)
+    })
+
+    
   })
   
 
