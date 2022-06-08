@@ -14,7 +14,7 @@ describe("ERC721, ERC721A, ERC1155, ERC1155D minting for gas comparison", () => 
   let owner;
   let alice;
   let bob;
-  let amount = 10;
+  let amount = 5;
 
   beforeEach(async () => {
     let signers = await ethers.getSigners()
@@ -60,17 +60,17 @@ describe("ERC721, ERC721A, ERC1155, ERC1155D minting for gas comparison", () => 
 
     it(`Should allow user to serially mint erc1155 ${amount} token with exact price`, async () => {
       await erc1155.connect(aliceAccount).mintNFTs(amount, {value: ethers.utils.parseEther(`${0.1*amount}`)})
-      expect(await erc1155.balanceOf(alice, amount-1)).to.be.equal(1)
+      expect(await erc1155.balanceOf(alice, amount)).to.be.equal(1)
     })
 
     it(`Should allow user to batch mint erc1155 ${amount} token with exact price`, async () => {
       await erc1155.connect(aliceAccount).mintBatchNFT(amount, {value: ethers.utils.parseEther(`${0.1*amount}`)})
-      expect(await erc1155.balanceOf(alice, await erc1155.getCurrentId()-1)).to.be.equal(amount)
+      expect(await erc1155.balanceOf(alice, await erc1155.getCurrentId())).to.be.equal(amount)
     })
 
-    it(`Should allow user to batch mint erc1155D ${amount} token with exact price`, async () => {
+    it(`Should allow user to mint erc1155D ${amount} token with exact price`, async () => {
       await erc1155d.connect(aliceAccount).mintNFTs(amount, {value: ethers.utils.parseEther(`${0.1*amount}`)})
-      expect(await erc1155d.balanceOf(alice, await erc1155d.getCurrentId()-1)).to.be.equal(1)
+      expect(await erc1155d.balanceOf(alice, await erc1155d.getCurrentId())).to.be.equal(1)
     })
 
   })
@@ -78,44 +78,44 @@ describe("ERC721, ERC721A, ERC1155, ERC1155D minting for gas comparison", () => 
 
   describe("Transfer of tokens", () => {
 
-    it(`Should mint by Alice and try to transfer ${amount} erc721 token from user Alice to user Carol`, async () => {
-      await erc721.connect(aliceAccount).mintNFTs(amount, {value: ethers.utils.parseEther(`${0.1*amount}`)})
-      for (let i = 0; i < amount ; i++){
-        await erc721.connect(aliceAccount).transferFrom(alice, carol, i)
-      }
+    it(`Should mint by Alice and try to transfer ${1} erc721 token from user Alice to user Carol`, async () => {
+      await erc721.connect(aliceAccount).mintNFTs(1, {value: ethers.utils.parseEther(`${0.1}`)})
+      
+      await erc721.connect(aliceAccount).transferFrom(alice, carol, 1)
+      
       expect(await erc721.balanceOf(alice)).to.be.equal(0)
-      expect(await erc721.balanceOf(carol)).to.be.equal(amount)
+      expect(await erc721.balanceOf(carol)).to.be.equal(1)
     })
 
-    it(`Should mint by Alice and try to transfer ${amount} erc721a token from user Alice to user Carol`, async () => {
-      await erc721a.connect(aliceAccount).mintNFTs(amount, {value: ethers.utils.parseEther(`${0.1*amount}`)})
-      for (let i = 0; i < amount ; i++){
-        await erc721a.connect(aliceAccount).transferFrom(alice, carol, i)
-      }
+    it(`Should mint by Alice and try to transfer ${1} erc721a token from user Alice to user Carol`, async () => {
+      await erc721a.connect(aliceAccount).mintNFTs(1, {value: ethers.utils.parseEther(`${0.1}`)})
+      
+      await erc721a.connect(aliceAccount).transferFrom(alice, carol, 1)
+      
       expect(await erc721a.balanceOf(alice)).to.be.equal(0)
-      expect(await erc721a.balanceOf(carol)).to.be.equal(amount)
+      expect(await erc721a.balanceOf(carol)).to.be.equal(1)
     })
 
-    it(`Should mint by Alice and try to transfer ${amount} erc1155 token from user Alice to user Carol`, async () => {
-      await erc1155.connect(aliceAccount).mintNFTs(amount, {value: ethers.utils.parseEther(`${0.1*amount}`)})
+    it(`Should mint by Alice and try to transfer ${1} erc1155 token from user Alice to user Carol`, async () => {
+      await erc1155.connect(aliceAccount).mintNFTs(1, {value: ethers.utils.parseEther(`${0.1}`)})
 
-      for (let i = 0; i < amount ; i++){
-        await erc1155.connect(aliceAccount).safeTransferFrom(alice, carol, i, 1, "0x")
-      }
+      
+      await erc1155.connect(aliceAccount).safeTransferFrom(alice, carol, 1, 1, "0x")
+      
 
-      expect(await erc1155.balanceOf(alice, amount-1)).to.be.equal(0)
-      expect(await erc1155.balanceOf(carol, amount-1)).to.be.equal(1)
+      expect(await erc1155.balanceOf(alice, 1)).to.be.equal(0)
+      expect(await erc1155.balanceOf(carol, 1)).to.be.equal(1)
     })
 
-    it(`Should mint by Alice and try to transfer ${amount} erc1155D token from user Alice to user Carol`, async () => {
-      await erc1155d.connect(aliceAccount).mintNFTs(amount, {value: ethers.utils.parseEther(`${0.1*amount}`)})
+    it(`Should mint by Alice and try to transfer ${1} erc1155D token from user Alice to user Carol`, async () => {
+      await erc1155d.connect(aliceAccount).mintNFTs(1, {value: ethers.utils.parseEther(`${0.1}`)})
 
-      for (let i = 0; i < amount ; i++){
-        await erc1155d.connect(aliceAccount).safeTransferFrom(alice, carol, i, 1, "0x")
-      }
+      
+        await erc1155d.connect(aliceAccount).safeTransferFrom(alice, carol, 1, 1, "0x")
+      
 
-      expect(await erc1155d.balanceOf(alice, amount-1)).to.be.equal(0)
-      expect(await erc1155d.balanceOf(carol, amount-1)).to.be.equal(1)
+      expect(await erc1155d.balanceOf(alice, 1)).to.be.equal(0)
+      expect(await erc1155d.balanceOf(carol, 1)).to.be.equal(1)
     })
 
     

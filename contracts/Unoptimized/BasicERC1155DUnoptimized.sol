@@ -2,15 +2,17 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./baseContracts/ERC1155D.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+
+import "../baseContracts/ERC1155D.sol";
 
 /**
  * @title ERC1155D example implementation
  */
-contract BasicERC1155D is ERC1155, Ownable {
+contract BasicERC1155DUnoptimized is ERC1155, Ownable {
     
-    uint256 index = 1;
-
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
 
     //Token config.
     uint256 public constant PRICE = 0.1 ether;
@@ -28,12 +30,9 @@ contract BasicERC1155D is ERC1155, Ownable {
         require(msg.value == PRICE * _number, "Not enought/Too much ether sent");
         
         for (uint i = 0; i < _number; ++i) {
-            uint256 _currentId = index;
+            uint256 _currentId = _tokenIds.current();
             _mint(msg.sender, _currentId, 1, '');
-
-            unchecked{
-                index = _currentId++;
-            }
+            _tokenIds.increment();
         }
         emit NFTMinted(_number, this.getCurrentId(), msg.sender);
 
@@ -41,7 +40,7 @@ contract BasicERC1155D is ERC1155, Ownable {
 
     
     function getCurrentId() external view returns(uint256){
-        return index;
+        return _tokenIds.current();
     }
 
      /// @dev retrieve all the funds obtained during minting

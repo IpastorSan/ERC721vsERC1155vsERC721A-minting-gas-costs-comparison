@@ -9,10 +9,10 @@ import "erc721a/contracts/ERC721A.sol";
 
 
 
-contract BasicERC721A is ERC721A, Ownable{
+contract BasicERC721AUnoptimized is ERC721A, Ownable{
 
     //comparisons are strictly less than for gas efficiency.
-    uint256 index = 1;
+    uint256 numberOfTokensMinted;
     uint256 public constant MAX_SUPPLY = 10001;
     uint256 public constant PRICE = 0.1 ether;
 
@@ -28,10 +28,6 @@ contract BasicERC721A is ERC721A, Ownable{
     function _baseURI() internal view override returns (string memory) {
        return baseTokenURI;
     }
-
-    function _startTokenId() internal view override returns(uint256){
-        return 1;
-    }
     
     /// @dev changes BaseURI and set it to the true URI for collection
     /// @param revealedTokenURI new token URI. Format required ipfs://CID/
@@ -41,19 +37,23 @@ contract BasicERC721A is ERC721A, Ownable{
 
     ///@dev returns current tokenId. There is no burn function so it can be assumed to be sequential
     function tokenId() external view returns(uint256) {
-        return index;
+        if (numberOfTokensMinted == 0) {
+            return 0;
+        } else {
+            uint currentId = numberOfTokensMinted - 1;
+            return currentId;
+        }
     }
 
     /// @dev mint @param _number of NFTs in one batch.
     function mintNFTs(uint256 _number) public payable {
-        uint256 totalMinted = index;
+        uint256 totalMinted = numberOfTokensMinted;
 
-        require(tx.origin == msg.sender, "The caller is another contract");
         require(totalMinted + _number < MAX_SUPPLY, "Not enough NFTs!");
         require(msg.value == PRICE * _number , "Not enough/too much ether sent");
 
-        _mint(msg.sender, _number);
-        unchecked {index = index + _number;}
+        _safeMint(msg.sender, _number);
+        numberOfTokensMinted += _number;
 
         emit NFTMinted(_number, this.tokenId(), msg.sender);
     }

@@ -6,11 +6,13 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract BasicERC721 is ERC721, Ownable {
-    uint256 index = 1;
+contract BasicERC721Unoptimized is ERC721, Ownable {
+    using Counters for Counters.Counter;
+
+    Counters.Counter private _tokenIds;
 
     //comparisons are strictly less than for gas efficiency.
-    uint256 public constant MAX_SUPPLY = 10001;
+    uint256 public constant MAX_SUPPLY = 10000;
     
     uint256 public constant PRICE = 0.1 ether;
 
@@ -35,29 +37,28 @@ contract BasicERC721 is ERC721, Ownable {
 
 
     function mintNFTs(uint256 _number) public payable {
-        uint256 _totalMinted = index;
+        uint256 _totalMinted = _tokenIds.current();
 
-        require(tx.origin == msg.sender, "The caller is another contract");
         require(_totalMinted + _number < MAX_SUPPLY, "Not enough NFTs!");
         require(msg.value == PRICE * _number , "Not enough/too much ether sent");
-        
 
         for (uint i = 0; i < _number; ++i) {
-            uint256 _currentId = index;
-
-            _mint(msg.sender, _currentId);
-
-            unchecked {
-                index = ++_currentId ;
-            }
+            _mintSingleNFT();
         }
 
-        emit NFTMinted(_number, index,msg.sender);
+        emit NFTMinted(_number, _tokenIds.current(), msg.sender);
     }
 
 
+    function _mintSingleNFT() internal {
+      uint _newTokenID = _tokenIds.current();
+      _safeMint(msg.sender, _newTokenID);
+      _tokenIds.increment();
+
+    }
+
     function getCurrentId() public view returns (uint256) {
-        return index;
+        return _tokenIds.current();
     }
 
     /// @dev retrieve all the funds obtained during minting
