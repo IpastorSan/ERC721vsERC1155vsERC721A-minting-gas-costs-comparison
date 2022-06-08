@@ -11,7 +11,7 @@ I used the gas report from [hardhat-gas-reporter](https://www.npmjs.com/package/
 Gas cost evolution (in gas points)
 ![gas cost evolution](gas-cost.png)
 
-Gas Cost evolution, assuming 50 Gwei and an ETH price of 1800USD
+Gas Cost evolution, assuming 70 Gwei and an ETH price of 1800USD
 ![Gas cost in usd](gas-cost-usd.png)
 
 Bonus Track: if you ever want to mint 1000 tokens, choose your standard wisely
@@ -26,3 +26,20 @@ Simple changes in all contracts that decreased the gas cost accross all standard
 - Increment index by 1 using ````unchecked```` inside the mint function. Safe since index will never go over 10.000 in our case.
 - Added ````require(tx.origin == msg.sender, "The caller is another contract");```` to all contracts (except ERC1155D, it brings it by defect) so we can use ````_mint()```` instead of ````_safeMint()````
 - Increased Optimizer to 10.000 rounds. It increases the deployment cost (slightly)
+
+The effect on these optimization on ERC1155D are the most striking (I was clearly not implementing it well in the previos versions). Up to 30 tokens it outperforms gas costs of ERC721A. This said, the team does not advice to use it in production yet, as it has not been formally audited.
+
+On average this saves
+- ERC721: 46.04% average (except for 1 token -> 17.76%)
+- ERC721A: 43.12% average (except for 1 token -> 25.33%)
+- ERC1155: 45.66% average (except for 1 token -> 24.75%)
+- ERC1155D: 80.9% average (except for 1 token -> 28.05%)
+
+Gas cost evolution (in gas points)
+![gas cost evolution](gas-cost-v2.png)
+
+Gas Cost evolution, assuming 70 Gwei and an ETH price of 1800USD
+![Gas cost in usd](gas-cost-usd-v2.png)
+
+Bonus Track: if you ever want to mint 1000 tokens, choose your standard wisely
+![BonusTrack](gas-report-100v2.png)
