@@ -14,7 +14,7 @@ describe("ERC721, ERC721A, ERC1155, ERC1155D minting for gas comparison", () => 
   let owner;
   let alice;
   let bob;
-  let amount = 100;
+  let amount = 10;
 
   beforeEach(async () => {
     let signers = await ethers.getSigners()
