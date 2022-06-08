@@ -30,17 +30,13 @@ contract BasicERC1155D is ERC1155, Ownable {
         require(msg.value == PRICE * _number, "Not enought/Too much ether sent");
         
         for (uint i = 0; i < _number; ++i) {
-            mint();
+            uint256 _currentId = _tokenIds.current();
+            _mint(msg.sender, _currentId, 1, '');
+            _tokenIds.increment();
         }
         emit NFTMinted(_number, this.getCurrentId(), msg.sender);
 
         }
-
-    function mint() public {
-        uint256 _currentId = _tokenIds.current();
-        _mint(msg.sender, _currentId, 1, '');
-        _tokenIds.increment();
-    }
 
     
     function getCurrentId() external view returns(uint256){
