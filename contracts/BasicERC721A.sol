@@ -12,7 +12,7 @@ import "erc721a/contracts/ERC721A.sol";
 contract BasicERC721A is ERC721A, Ownable{
 
     //comparisons are strictly less than for gas efficiency.
-    uint256 index = 1;
+
     uint256 public constant MAX_SUPPLY = 10001;
     uint256 public constant PRICE = 0.1 ether;
 
@@ -39,10 +39,7 @@ contract BasicERC721A is ERC721A, Ownable{
         baseTokenURI = revealedTokenURI;
     }
 
-    ///@dev returns current tokenId. There is no burn function so it can be assumed to be sequential
-    function tokenId() external view returns(uint256) {
-        return index;
-    }
+
 
     /// @dev mint @param _number of NFTs in one batch.
     function mintNFTs(uint256 _number) public payable {
@@ -53,9 +50,9 @@ contract BasicERC721A is ERC721A, Ownable{
         require(msg.value == PRICE * _number , "Not enough/too much ether sent");
 
         _mint(msg.sender, _number);
-        unchecked {index = index + _number;}
+        
 
-        emit NFTMinted(_number, this.tokenId(), msg.sender);
+        emit NFTMinted(_number, totalSupply(), msg.sender);
     }
 
     /// @dev retrieve all the funds obtained during minting
