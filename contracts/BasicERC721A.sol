@@ -43,10 +43,9 @@ contract BasicERC721A is ERC721A, Ownable{
 
     /// @dev mint @param _number of NFTs in one batch.
     function mintNFTs(uint256 _number) public payable {
-        uint256 totalMinted = index;
 
         require(tx.origin == msg.sender, "The caller is another contract");
-        require(totalMinted + _number < MAX_SUPPLY, "Not enough NFTs!");
+        require(totalSupply() + _number < MAX_SUPPLY, "Not enough NFTs!");
         require(msg.value == PRICE * _number , "Not enough/too much ether sent");
 
         _mint(msg.sender, _number);
